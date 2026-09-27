@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="container-xxl text-center p-3">
+    <h1 class="">Machine Learning Knowledge Tree</h1>
+
+    <div class="row row-cols-6">
+        {% for lecture in lectures %}
+        <div class="card col m-4" style="width: 13rem;">
+            <img src="..." class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ lecture.title }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for topic in lecture.topics %}
+                <li class="list-group-item"> <a href="{{ url_for('main.topic', id=topic.id) }}">{{ topic.title }} </a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

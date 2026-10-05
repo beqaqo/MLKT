@@ -1,31 +1,69 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container-xxl text-center p-3">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    <h4 class="mb-4 text-center">Admin Panel</h4>
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert alert-danger">{{ messages[0] }}</div>
-                        {% endif %}
-                    {% endwith %}
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="text" name="email" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
-                </div>
+<style>
+    .login-card .form-control {
+        background: var(--tree-bg);
+        border-color: var(--tree-line);
+        color: var(--tree-text);
+    }
+    .login-card .form-control:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+    .login-card .form-label {
+        color: var(--tree-muted);
+        font-size: .85rem;
+    }
+    .btn-accent {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #14110a;
+        font-weight: 600;
+    }
+    .btn-accent:hover,
+    .btn-accent:focus-visible {
+        background: color-mix(in srgb, var(--accent) 85%, #fff);
+        border-color: var(--accent);
+        color: #14110a;
+        box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 55%, transparent);
+    }
+</style>
+
+<div class="container-xxl p-3 d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="col-11 col-sm-8 col-md-5 col-lg-4 col-xl-3">
+
+        <div class="week-badge login-card p-4" style="--accent: #f5b942;">
+
+            <div class="lecture-icon mx-auto mb-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f5b942" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="4" y="11" width="16" height="10" rx="2"></rect>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                </svg>
             </div>
+
+            <h1 class="tree-title h4 text-center">Admin Panel</h1>
+            <p class="tree-subtitle text-center mb-4">Log in to manage the tree</p>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger" role="alert">{{ messages[0] }}</div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" id="email" name="email" class="form-control" autocomplete="username" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-accent w-100">Login</button>
+            </form>
         </div>
+
     </div>
 </div>
 {% endblock %}

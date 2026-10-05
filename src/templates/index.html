@@ -1,23 +1,68 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container-xxl text-center p-3">
-    <h1 class="">Machine Learning Knowledge Tree</h1>
+<div class="container-fluid px-3 px-xl-5 py-4">
 
-    <div class="row row-cols-6">
-        {% for lecture in lectures %}
-        <div class="card col m-4" style="width: 13rem;">
-            <img src="..." class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">{{ lecture.title }}</h5>
+    <header class="text-center mb-3">
+        <div class="tree-header">
+            <img class="tree-header-bg" src="../static/images/tree-header-cropped.png" alt="">
+            <div class="tree-header-content">
+                <h1 class="tree-title">Machine Learning Knowledge Tree</h1>
+                <p class="tree-subtitle">Explore &bull; Connect &bull; Master</p>
             </div>
-            <ul class="list-group list-group-flush">
-                {% for topic in lecture.topics %}
-                <li class="list-group-item"> <a href="{{ url_for('main.topic', id=topic.id) }}">{{ topic.title }} </a></li>
-                {% endfor %}
-            </ul>
         </div>
+    </header>
+
+    {# 7 weeks in the first row, the rest in the second row #}
+    {% for row in lectures|sort(attribute='week')|batch(5) %}
+    <div class="week-row {% if not loop.last %}mb-5{% endif %}">
+        {% for lecture in row %}
+        <section class="week-col" style="--accent: {{ lecture.color or '#f5b942' }};">
+
+            {# 1. week title #}
+            <div class="week-badge">
+                <img class="week-badge-bg" src="../static/images/LectureHeaderBackground.png" alt="">
+                <div class="week-badge-content">
+                    <div class="week-label mt-1">Week {{ lecture.week }}</div>
+                    <h2 class="week-title">{{ lecture.title }}</h2>
+                </div>
+            </div>
+
+            <div class="test-bg p-2">
+                {# 2. week icon #}
+                <div class="lecture-icon mx-auto mt-1">
+                    {% if lecture.icon %}<img src="{{ url_for('static', filename='uploads/' ~ lecture.icon) }}" alt="">{%
+                    endif %}
+                </div>
+
+                {# 3. topics, each with its own icon #}
+                <ul class="topic-list">
+                    {% for topic in lecture.topics %}
+                    <li class="topic-item">
+                    <span class="topic-icon">
+                        {% if topic.icon %}<img src="{{ url_for('static', filename='uploads/' ~ topic.icon) }}" alt="">{% endif %}
+                    </span>
+                        <a class="topic-link" href="{{ topic.google_colab_link }}" target="_blank" rel="noopener">{{
+                            topic.title }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
         {% endfor %}
     </div>
+    {% else %}
+    <p class="text-center text-secondary">No lectures yet. Add some to grow the tree.</p>
+    {% endfor %}
+
+    <footer class="text-center mt-5">
+<!--        <div class="tree-legend">-->
+<!--            <span><span class="legend-dot" style="border-color:#f5b942"></span>Main topic (week)</span>-->
+<!--            <span><span class="legend-dot" style="border-color:#4da3ff"></span>Sub-topic</span>-->
+<!--            <span><span class="legend-dot" style="border-color:#8b93a7"></span>Article / notebook</span>-->
+<!--            <span><span class="legend-line"></span>Prerequisite / connection</span>-->
+<!--        </div>-->
+    </footer>
+
 </div>
 {% endblock %}

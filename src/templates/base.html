@@ -1,17 +1,259 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ML Tree</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <style>
+        :root {
+            --tree-bg: #0b0d14;
+            --tree-panel: #11141e;
+            --tree-text: #dfe3ee;
+            --tree-muted: #8b93a7;
+            --tree-line: rgba(255, 255, 255, .22);
+        }
+
+        body {
+            background-color: var(--tree-bg);
+            background-image: url("../static/images/Backgroun_1.png");
+            color: var(--tree-text);
+            min-height: 100vh;
+        }
+
+        /* ---------- header ---------- */
+        .tree-header {
+            position: relative;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .tree-header-bg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* text layer sits on top of the image, centered inside the frame */
+        .tree-header-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 9%; /* keeps text clear of the gold end ornaments */
+        }
+
+        .tree-title {
+            margin: 0;
+            font-size: clamp(0.9rem, 2.6vw, 2rem);
+            color: #f5d98b;
+        }
+
+        .tree-subtitle {
+            margin: 0;
+            font-size: clamp(0.65rem, 1.4vw, 1rem);
+            color: #cfd8e6;
+        }
+
+        .tree-hint {
+            color: var(--tree-muted);
+            font-size: .85rem;
+        }
+
+        /* ---------- week rows ---------- */
+
+        .week-row {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem 1rem;
+        }
+
+        .week-col {
+            flex: 1 1 10rem;
+            max-width: 15rem;
+        }
+
+        /* one row of 7 / 6 weeks with a connecting line on wide screens */
+        @media (min-width: 1200px) {
+            .week-row {
+                flex-wrap: nowrap;
+            }
+
+            .week-col {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+
+            .week-row::before {
+                content: "";
+                position: absolute;
+                top: 2rem;
+                left: 0;
+                right: 0;
+            }
+        }
+
+        /* ---------- week card ---------- */
+        .week-badge {
+            display: grid; /* image and text share one cell, so the text sets the height */
+            margin: 0 auto;
+            min-height: 64px; /* minimum height, raise it for a taller badge */
+        }
+
+        .test-bg {
+            position: relative;
+            z-index: 1;
+            background: var(--tree-panel);
+            border: 2px solid var(--accent);
+            border-radius: 1rem;
+            box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+        }
+
+        .week-badge-bg,
+        .week-badge-content {
+            grid-area: 1 / 1;
+        }
+
+        .week-badge-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* stretches to whatever height the text needs */
+        }
+
+        .week-badge-content {
+            display: flex;
+            flex-direction: column; /* week label on top, title below */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.5rem 14%; /* keeps text clear of the side ornaments */
+        }
+
+        .week-label {
+            margin: 0 0 0.05rem;
+            font-size: 0.7rem;
+            line-height: 1;
+            color: #f5d98b;
+        }
+
+        .week-title {
+            margin: 0;
+            font-size: 0.85rem;
+            line-height: 1.2;
+            color: #f5d98b;
+            white-space: normal; /* wrapping on */
+        }
+
+        .lecture-icon,
+        .topic-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--tree-panel);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
+        }
+
+        .lecture-icon {
+            width: 4.25rem;
+            height: 4.25rem;
+        }
+
+        .topic-icon {
+            flex: 0 0 2.4rem;
+            width: 2.4rem;
+            height: 2.4rem;
+            box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+
+        .lecture-icon img,
+        .topic-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ---------- topics ---------- */
+        .topic-list {
+            list-style: none;
+            margin: 0 0 0 1.5rem;
+            padding: .5rem 0 0;
+            border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            padding: .4rem 0;
+            /* centre the circle on the vertical line */
+            margin-left: calc(-1.2rem - 1px);
+        }
+
+        .topic-link {
+            color: var(--tree-text);
+            text-decoration: none;
+            font-size: .85rem;
+            line-height: 1.25;
+        }
+
+        .topic-link:hover,
+        .topic-link:focus-visible {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        /* ---------- footer / legend ---------- */
+        .tree-legend {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: .5rem 1.25rem;
+            justify-content: center;
+            border: 1px solid var(--tree-line);
+            border-radius: .75rem;
+            background: var(--tree-panel);
+            padding: .6rem 1rem;
+            font-size: .8rem;
+            color: var(--tree-muted);
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: .8rem;
+            height: .8rem;
+            border-radius: 50%;
+            border: 2px solid;
+            margin-right: .4rem;
+            vertical-align: -.1rem;
+        }
+
+        .legend-line {
+            display: inline-block;
+            width: 1rem;
+            height: 0;
+            border-top: 2px solid #f5b942;
+            margin-right: .4rem;
+            vertical-align: .2rem;
+        }
+    </style>
 </head>
 <body>
-    {% block body %}
-        block body is not filled
-    {% endblock %}
+{% block body %}
+block body is not filled
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"
+        integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y"
+        crossorigin="anonymous"></script>
 </body>
 </html>

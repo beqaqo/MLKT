@@ -10,6 +10,7 @@ import os
 from src.config import Config
 from src.models import Topic
 
+
 class SecureModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
@@ -31,7 +32,7 @@ class TopicInline(InlineFormAdmin):
         }
     }
 
-    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/{m.icon}" width="100">') }
+    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/uploads/{m.icon}" width="75">'),}
 
 class LectureView(SecureModelView):
     create_modal = True
@@ -49,8 +50,15 @@ class LectureView(SecureModelView):
         }
     }
 
-    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/{m.icon}" width="100">') }
-
+    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/uploads/{m.icon}" width="75">'),
+                         "color": lambda v, c, m, p: Markup(
+                             f'<span style="display:inline-flex; align-items:center; gap:8px;">'
+                             f'<span style="width:25px; height:25px; '
+                             f'background-color:{m.color}; '
+                             f'border:1px solid #ccc; border-radius:4px;"></span>'
+                             f'<span>{m.color}</span>'
+                             f'</span>'
+                         ) if m.color else ""}
     inline_models = [TopicInline(Topic)]
 
 
@@ -70,4 +78,4 @@ class TopicView(SecureModelView):
         }
     }
 
-    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/{m.icon}" width="100">') }
+    column_formatters = {'icon': lambda s, c, m, n: Markup(f'<img src="/static/uploads/{m.icon}" width="75">'),}
